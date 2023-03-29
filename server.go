@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"purreads/app/database"
+	"purreads/database"
 	"purreads/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
