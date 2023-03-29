@@ -38,5 +38,5 @@ type Query {
 type Mutation {
   createBook(input: NewBook!): Book!
   createCat(input: NewCat!): Cat!
-  addBookCat(input: AddBookToCatInput!): Cat!
+  addBookToCat(input: AddBookToCatInput!): Cat!
 }

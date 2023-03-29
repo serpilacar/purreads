@@ -61,9 +61,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddBookCat func(childComplexity int, input model.AddBookToCatInput) int
-		CreateBook func(childComplexity int, input model.NewBook) int
-		CreateCat  func(childComplexity int, input model.NewCat) int
+		AddBookToCat func(childComplexity int, input model.AddBookToCatInput) int
+		CreateBook   func(childComplexity int, input model.NewBook) int
+		CreateCat    func(childComplexity int, input model.NewCat) int
 	}
 
 	Query struct {
@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error)
 	CreateCat(ctx context.Context, input model.NewCat) (*model.Cat, error)
-	AddBookCat(ctx context.Context, input model.AddBookToCatInput) (*model.Cat, error)
+	AddBookToCat(ctx context.Context, input model.AddBookToCatInput) (*model.Cat, error)
 }
 type QueryResolver interface {
 	Books(ctx context.Context) ([]*model.Book, error)
@@ -160,17 +160,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Cat.ReadBooks(childComplexity), true
 
-	case "Mutation.addBookCat":
-		if e.complexity.Mutation.AddBookCat == nil {
+	case "Mutation.addBookToCat":
+		if e.complexity.Mutation.AddBookToCat == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_addBookCat_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addBookToCat_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.AddBookCat(childComplexity, args["input"].(model.AddBookToCatInput)), true
+		return e.complexity.Mutation.AddBookToCat(childComplexity, args["input"].(model.AddBookToCatInput)), true
 
 	case "Mutation.createBook":
 		if e.complexity.Mutation.CreateBook == nil {
@@ -300,7 +300,7 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_addBookCat_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_addBookToCat_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.AddBookToCatInput
@@ -942,8 +942,8 @@ func (ec *executionContext) fieldContext_Mutation_createCat(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_addBookCat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addBookCat(ctx, field)
+func (ec *executionContext) _Mutation_addBookToCat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addBookToCat(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -956,7 +956,7 @@ func (ec *executionContext) _Mutation_addBookCat(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddBookCat(rctx, fc.Args["input"].(model.AddBookToCatInput))
+		return ec.resolvers.Mutation().AddBookToCat(rctx, fc.Args["input"].(model.AddBookToCatInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -973,7 +973,7 @@ func (ec *executionContext) _Mutation_addBookCat(ctx context.Context, field grap
 	return ec.marshalNCat2ᚖpurreadsᚋgraphᚋmodelᚐCat(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_addBookCat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_addBookToCat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -1004,7 +1004,7 @@ func (ec *executionContext) fieldContext_Mutation_addBookCat(ctx context.Context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addBookCat_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_addBookToCat_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3297,10 +3297,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "addBookCat":
+		case "addBookToCat":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addBookCat(ctx, field)
+				return ec._Mutation_addBookToCat(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
