@@ -61,7 +61,12 @@ func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 }
 
 // Cats is the resolver for the cats field.
-func (r *queryResolver) Cats(ctx context.Context) ([]*model.Cat, error) {
+func (r *queryResolver) Cats(ctx context.Context, id *int) ([]*model.Cat, error) {
+	if id != nil {
+		cat := &model.Cat{ID: *id}
+		err := r.DB.First(cat).Error
+		return []*model.Cat{cat}, err
+	}
 	cats := []*model.Cat{}
 	err := r.DB.Model(&model.Cat{}).Preload(clause.Associations).Find(&cats).Error
 	return cats, err

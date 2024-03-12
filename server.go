@@ -10,6 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/joho/godotenv"
+
+	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 const defaultPort = "8080"
@@ -37,6 +39,18 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		DB: db,
 	}}))
+
+	if len(os.Getenv("NEW_RELIC_LICENSE")) != 0 {
+		// initialize new relic
+		_, newRelicErr := newrelic.NewApplication(
+			newrelic.ConfigAppName("purreads"),
+			newrelic.ConfigLicense(os.Getenv("NEW_RELIC_LICENSE")),
+			newrelic.ConfigAppLogForwardingEnabled(true),
+		)
+		if newRelicErr != nil {
+			panic(newRelicErr)
+		}
+	}
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
