@@ -68,7 +68,8 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Books func(childComplexity int) int
-		Cats  func(childComplexity int, id *int) int
+		Cat   func(childComplexity int, id *int) int
+		Cats  func(childComplexity int) int
 	}
 }
 
@@ -79,7 +80,8 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Books(ctx context.Context) ([]*model.Book, error)
-	Cats(ctx context.Context, id *int) ([]*model.Cat, error)
+	Cats(ctx context.Context) ([]*model.Cat, error)
+	Cat(ctx context.Context, id *int) (*model.Cat, error)
 }
 
 type executableSchema struct {
@@ -203,17 +205,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Books(childComplexity), true
 
+	case "Query.cat":
+		if e.complexity.Query.Cat == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cat_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Cat(childComplexity, args["id"].(*int)), true
+
 	case "Query.cats":
 		if e.complexity.Query.Cats == nil {
 			break
 		}
 
-		args, err := ec.field_Query_cats_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Cats(childComplexity, args["id"].(*int)), true
+		return e.complexity.Query.Cats(childComplexity), true
 
 	}
 	return 0, false
@@ -365,7 +374,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_cats_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_cat_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *int
@@ -1097,7 +1106,7 @@ func (ec *executionContext) _Query_cats(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Cats(rctx, fc.Args["id"].(*int))
+		return ec.resolvers.Query().Cats(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1138,6 +1147,64 @@ func (ec *executionContext) fieldContext_Query_cats(ctx context.Context, field g
 			return nil, fmt.Errorf("no field named %q was found under type Cat", field.Name)
 		},
 	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_cat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_cat(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Cat(rctx, fc.Args["id"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Cat)
+	fc.Result = res
+	return ec.marshalNCat2ᚖpurreadsᚋgraphᚋmodelᚐCat(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_cat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Cat_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_Cat_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_Cat_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_Cat_email(ctx, field)
+			case "readBooks":
+				return ec.fieldContext_Cat_readBooks(ctx, field)
+			case "inProgressBooks":
+				return ec.fieldContext_Cat_inProgressBooks(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Cat", field.Name)
+		},
+	}
 	defer func() {
 		if r := recover(); r != nil {
 			err = ec.Recover(ctx, r)
@@ -1145,7 +1212,7 @@ func (ec *executionContext) fieldContext_Query_cats(ctx context.Context, field g
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_cats_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_cat_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3400,6 +3467,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_cats(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "cat":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cat(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

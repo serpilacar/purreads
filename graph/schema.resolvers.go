@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"purreads/graph/model"
 
 	"gorm.io/gorm/clause"
@@ -61,15 +62,20 @@ func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 }
 
 // Cats is the resolver for the cats field.
-func (r *queryResolver) Cats(ctx context.Context, id *int) ([]*model.Cat, error) {
-	if id != nil {
-		cat := &model.Cat{ID: *id}
-		err := r.DB.First(cat).Error
-		return []*model.Cat{cat}, err
-	}
+func (r *queryResolver) Cats(ctx context.Context) ([]*model.Cat, error) {
 	cats := []*model.Cat{}
 	err := r.DB.Model(&model.Cat{}).Preload(clause.Associations).Find(&cats).Error
 	return cats, err
+}
+
+// Cat is the resolver for the cat field.
+func (r *queryResolver) Cat(ctx context.Context, id *int) (*model.Cat, error) {
+	if id == nil {
+		return nil, errors.New("ID is required")
+	}
+	cat := &model.Cat{ID: *id}
+	err := r.DB.First(&cat).Error
+	return cat, err
 }
 
 // Mutation returns MutationResolver implementation.

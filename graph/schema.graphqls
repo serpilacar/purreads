@@ -32,7 +32,8 @@ input AddBookToCatInput {
 
 type Query {
   books: [Book!]!
-  cats(id: Int): [Cat!]!
+  cats: [Cat!]!
+  cat(id: Int): Cat!
 }
 
 type Mutation {

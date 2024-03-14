@@ -6,11 +6,11 @@ Purreads is a simple Goodreads clone with a very limited functionality. I initia
 
 With Purreads you can create a new ~~user~~ cat, create a new book or add a book to a cats' library as an "in progress" or a "read" book.
 
-Main packages:
+Built with:
 
-- [GORM](https://gorm.io/gorm) for the ORM
-- [PostgreSQL](https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL) as the database
-- [gqlgen](https://github.com/99designs/gqlgen) for the GraphQL server
+- [GORM](https://gorm.io/gorm)
+- [PostgreSQL](https://gorm.io/docs/connecting_to_the_database.html#PostgreSQL)
+- [gqlgen](https://github.com/99designs/gqlgen)
 
 ## Schema
 
