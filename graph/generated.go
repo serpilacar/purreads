@@ -30,6 +30,14 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 	}
 }
 
+func TestNewExecutableSchema(cfg Config) graphql.ExecutableSchema {
+	return &executableSchema{
+		resolvers:  cfg.Resolvers,
+		directives: cfg.Directives,
+		complexity: cfg.Complexity,
+	}
+}
+
 type Config struct {
 	Resolvers  ResolverRoot
 	Directives DirectiveRoot
